@@ -1,6 +1,6 @@
 <script setup>
   import * as Cesium from 'cesium';
-  import { ElTabs, ElTabPane, ElSelect, ElSpace, ElUpload, ElCheckbox, ElCheckboxGroup, ElDivider, ElCollapse, ElCollapseItem, ElDescriptions, ElDescriptionsItem, ElTooltip, ElDatePicker } from 'element-plus';
+  import { ElTabs, ElTabPane, ElSelect, ElSpace, ElUpload, ElCheckbox, ElCheckboxGroup, ElDivider, ElCollapse, ElCollapseItem, ElDescriptions, ElDescriptionsItem, ElTooltip, ElDatePicker, ElMessage } from 'element-plus';
   import { Tools, TrendCharts, DataAnalysis, DocumentAdd } from '@element-plus/icons-vue'
   // import { initCesium } from '@/utils/js/initCesium';
   import 'cesium/Build/Cesium/Widgets/widgets.css';
@@ -183,11 +183,16 @@
   //参数
   const timeOptions = ref(timeParams);
   const XGBOptions = ref(XGBParams);
-  console.log(timeOptions, XGBOptions);
+  const disabledDate = (time) => {
+    return time.getTime() < new Date('1985-01-01 00:00:00').getTime() || time.getTime() > new Date('2018-12-31 23:59:59').getTime();
+  }
 
   //开始训练Start Train
   const handleStartTrain = async () => {
-    console.log(enviormentList.value, humanList.value)
+    if(newModelName.value.length == 0) {
+      ElMessage.error('Please give the model a name')
+      return;
+    }
     //处理环境因子 
     let enviorment = {};
     for(let item of enviormentList.value) {
@@ -245,12 +250,10 @@
       modelId: model.value,
       functionId: moduleFunc.value,
       projectId: activeProjectId.value,
+      subModelName: newModelName.value,
       enviorment,
       human,
       configValue
-    }
-    if(newModelName.value.length > 0) {
-      params.subModelName = newModelName.value;
     }
     console.log(params);
     const res = await post('http://127.0.0.1:8001/api/trainModel', params);
@@ -262,7 +265,7 @@
   const radarData = ref([]);
   const completeStatus = ref([])
   const getTrainingStatus = () => {
-    const res = get(`http:127.0.0.1:8001/api/models/getTrainingStatus?modelId=${model.value}&projectId=${activeProjectId.value}&functionId=${moduleFunc.value}`);
+    const res = get(`http://127.0.0.1:8001/api/checkTrainStatus?modelId=${model.value}&projectId=${activeProjectId.value}&functionId=${moduleFunc.value}&subModelName=${newModelName.value}`);
     console.log(res);
     let temp = [];
     res.precision?.forEach(item => {
@@ -425,7 +428,7 @@
             </template>
             <div>
                 <h6>New Model Name</h6>
-                <el-input placeholder="Please input a name, if want to save it as a new model" v-model="newModelName" />
+                <el-input placeholder="Please input a name for your model" v-model="newModelName" />
                 <el-collapse v-model="activeNames" accordion>
                   <el-collapse-item name="1">
                     <template #title>
@@ -511,6 +514,8 @@
                             type="yearrange"
                             unlink-panels
                             size="small"
+                            :disabled-date="disabledDate"
+                            :default-time="[new Date(1985, 1,1, 0,0,0), new Date(2018, 12, 31, 23, 59, 59)]"
                             range-separator="To"
                             start-placeholder="Start"
                             end-placeholder="End"
@@ -549,16 +554,17 @@
                               {{ item.name }}
                             </div>
                           </el-tooltip>
-                        </template>                       
+                        </template>
+                        <div class="config-value">                       
                           <el-input-number
                             v-model="item.value"
                             controls-position="right"
-                            class="config-value"
                             :min="item.from"
                             :max="item.to"
                             :step="item.step"
                             size="small"
-                          />                     
+                          />
+                        </div>                   
                       </el-descriptions-item>     
                     </el-descriptions>
                   </el-collapse-item>
@@ -759,7 +765,7 @@
       margin-top: 8px;
       font-size: 12px;
     }
-    .config-input {
+    .config-value {
       span {
         font-size: 12px;
       }
