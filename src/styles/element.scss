@@ -1,0 +1,180 @@
+$bg-color: rgba(11, 31, 56);
+$bg-color-08: rgba(11, 31, 56, 0.8);
+$lightgray: lightgray;
+$bg-color-2: rgba(4, 15, 21, 0.4);
+$bg-color-3: rgba(4, 15, 21, 1);
+
+//select
+.el-select__wrapper {
+    background-color: $bg-color-2;
+}
+.el-select-dropdown__item {
+    background-color: $bg-color-2;
+    color: $lightgray;
+}
+.el-select__placeholder {
+    color: $lightgray;
+}
+.el-select-dropdown__list {
+    padding: 0;
+}
+.el-select-dropdown__item.is-hovering{
+    background-color: $bg-color-2;
+}
+
+//popper
+.el-popper.is-light {
+    background-color: $bg-color-3;
+}
+
+//upload
+.el-upload-dragger {
+    background-color: $bg-color;
+}
+
+//checkbox
+.el-checkbox {
+    margin-right: 8px;
+    --el-checkbox-font-size: 12px;
+    --el-checkbox-input-height: 10px;
+    --el-checkbox-input-width: 10px;
+    height: 16px;
+}
+.el-checkbox__inner {
+    background-color: $bg-color;
+}
+.el-checkbox__inner:after{
+    height: 5px;
+    left: 2px;
+    top: 0px;
+}
+.el-checkbox__label {
+    color: $lightgray;
+    font-size: 10px;
+    padding-left: 4px;
+}
+
+//input
+.el-input-number .el-input__wrapper {
+    background: $bg-color;
+}
+.el-input__wrapper {
+    background: $bg-color;
+}
+.el-input__inner {
+    background: $bg-color;
+    color: $lightgray;
+}
+.el-input-number__decrease, .el-input-number__increase {
+    background: transparent;
+    color: $lightgray;
+}
+
+//tab
+.el-tabs--border-card {
+    background: $bg-color-08;
+    color: $lightgray;
+    border-color:$bg-color;
+}
+.el-tabs--border-card>.el-tabs__header .el-tabs__item {
+    height: 48px;
+    background: $bg-color-08;
+    color: $lightgray;
+    border: none;
+}
+.el-tabs--border-card>.el-tabs__header .el-tabs__item.is-active {
+    background: $bg-color-08;
+}
+.el-tabs--border-card>.el-tabs__content {
+    height: calc(100vh - 100px);
+    overflow-y: auto;
+}
+
+//menu
+.el-menu-item {
+    color: white;
+}
+.el-menu-item.slogan button .el-icon {
+    margin-right: 0px;
+}
+.el-menu--horizontal>.el-menu-item {
+    color: white;
+}
+.el-menu--horizontal .el-menu-item:not(.is-disabled):hover {
+    color: white;
+}
+.el-menu--horizontal .el-menu-item:not(.is-disabled):focus {
+    border: transparent;
+}
+
+//dialog
+.el-dialog {
+    background-color: $bg-color-08;
+    .el-dialog__title {
+        color: $lightgray;
+    }
+    .el-form-item__label {
+        color: $lightgray;
+    }
+}
+
+//textarea
+.el-textarea__inner {
+    background: $bg-color;
+    color: $lightgray;
+}
+
+//table
+.el-table {
+    --el-table-header-bg-color: $bg-color-08;
+    --el-table-bg-color: rgba(4, 15, 21, 0.4);
+    --el-table-tr-bg-color: rgba(4, 15, 21, 0.4);
+    --el-table-border: none;
+    color: $lightgray;
+    font-size: 12px;
+    .cell {
+        padding: 0 6px;
+    }
+    .el-table__row {
+        
+    }
+    .el-table__cell {
+        padding: 0px;
+    }
+}
+
+//折叠面板
+.el-collapse {
+    border: none;
+}
+.el-collapse-item__header {
+    background-color: $bg-color-08;
+    color: $lightgray;
+    border-bottom: none;
+    .el-collapse-item__arrow {
+        color: $lightgray;
+    }
+}
+.el-collapse-item__wrap {
+    background-color: $bg-color-08;
+    border-bottom: none;
+}
+.el-collapse-item__content {
+    padding-bottom: 12px;
+}
+
+//描述列表
+.el-descriptions {
+    --el-descriptions-item-bordered-label-background: unset;
+    color: $lightgray;
+}
+.el-descriptions__label.el-descriptions__cell.is-bordered-label {
+    color: unset;
+}
+.el-descriptions__body {
+    background-color: unset;
+    color: $lightgray;
+}
+.el-descriptions--small .el-descriptions__body .el-descriptions__table .el-descriptions__cell {
+    font-size: 11px;
+}

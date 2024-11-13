@@ -1,0 +1,51 @@
+:root,
+body,
+#app {
+    width: 100%;
+    height: 100%;
+}
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.ali-center {
+  align-items: center;
+}
+.ali-bl {
+  align-items: baseline;
+}
+.just-sb {
+  justify-content: space-between;
+}
+.wrap {
+  flex-wrap: wrap;
+}
+.ft-12 {
+  font-size: 12px;
+}
+.ft-14 {
+  font-size: 14px;
+}
+.gap-4 {
+  gap: 1rem;
+}
+.mb-4 {
+  margin-bottom: 1rem;
+}
+.lightgray {
+  color: lightgray;
+}
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+}
