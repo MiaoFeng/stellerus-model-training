@@ -327,10 +327,7 @@
   const colorSampleTableData = ref([]);
 
   const getResult = async() => {
-    const res = await get('http://127.0.0.1:8000/api/models/getResult', {
-
-      }
-    );
+    const res = await get(`http://127.0.0.1:8000/api/getResult?modelId=${model.value}&projectId=${activeProjectId.value}&functionId=${moduleFunc.value}&subModelName=${newModelName.value}`);
     const { result, layerUrl, layerName, layerBbox } = res;
     const temp = result.map(item => {
       item.result.name = item.name;
@@ -366,6 +363,11 @@
   const changeLayerOpacity = (opacity) => {
     setLayerOpacity(viewer, activeLayer.value, opacity); //设置图层透明度
   }
+
+  //下载
+  /* const downloadUrl = computend(() => {
+    return `http://127.0.0.1:8000/api/getResult?modelId=${model.value}&projectId=${activeProjectId.value}&functionId=${moduleFunc.value}&subModelName=${newModelName.value}`
+  }) */
 </script>
 
 <template>
@@ -687,7 +689,9 @@
                 />
               </div>
               <div class="footer-btn">
-                <el-button type="primary" size="small">Download Result</el-button>
+                <a :href="`http://127.0.0.1:8000/api/downloadResult?modelId=${model}&projectId=${activeProjectId}&functionId=${moduleFunc}&subModelName=${newModelName}`" download target="blank">
+                  <el-button type="primary" size="small">Download Result</el-button>
+                </a>
               </div>  
             </div>
           </el-tab-pane>
