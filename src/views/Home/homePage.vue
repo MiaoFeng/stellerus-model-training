@@ -194,12 +194,15 @@
     return time.getTime() < new Date('1985-01-01 00:00:00').getTime() || time.getTime() > new Date('2018-12-31 23:59:59').getTime();
   }
 
+  //start Train按钮点击后，isTrainStarted为true，显示loading,按钮不可点击
+  const isTrainStarted = ref(false);
   //开始训练Start Train
   const handleStartTrain = async () => {
     if(newModelName.value.length == 0) {
       ElMessage.error('Please give the model a name')
       return;
     }
+    isTrainStarted.value = true;
     //处理环境因子 
     let enviorment = {};
     for(let item of enviormentList.value) {
@@ -264,7 +267,8 @@
     }
     console.log(params);
     const res = await post('http://127.0.0.1:8001/api/trainModel', {data: params});
-    activeNames.value = ['3'];
+    isTrainStarted.value = false;
+    activeTab.value = '3';
     console.log(res)
   }
 
@@ -289,8 +293,12 @@
     completeStatus.value = res.completeStatus[0];
   }
 
+  //保存新建的layer
   const activeLayer = ref(null);
+  //start Forcast按钮点击后，isForcastStarted为true，显示loading,按钮不可点击
+  const isForcastStarted = ref(false);
   const handleStartForcast = async() => {
+    isForcastStarted.value = true;
     const res = await post('http://127.0.0.1:8000/api/runLandslide', {
         data: {
           modelId: model.value,
@@ -300,7 +308,8 @@
         }        
       }
     );
-    activeNames.value = ['4'];
+    isForcastStarted.value = false;
+    activeTab.value = '4';
     const { result, layerUrl, layerName, layerBbox } = res;
     const temp = result.map(item => {
       item.result.name = item.name;
@@ -333,7 +342,7 @@
     const { westBoundLongitude: west, southBoundLatitude: south, eastBoundLongitude: east, northBoundLatitude: north } = layerBbox;
     flyToRectangle(viewer, west, east, south, north);
   }
-  
+
   //加载结果图层
   const addFilterWmslayer = (url, layers) => {
     var wms = new Cesium.WebMapServiceImageryProvider({
@@ -418,7 +427,7 @@
                     action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
                     :on-change="handleChange"
                   >
-                    <el-button type="primary">Click to upload</el-button>
+                    <el-button size="small">Click to upload</el-button>
                     <template #tip>
                       <div class="el-upload__tip">
                         Choose file with the button or drop file in the under area
@@ -456,7 +465,7 @@
               </span>
             </template>
             <div>
-                <h6>New Model Name</h6>
+                <h6 class="mb-8">New Model Name</h6>
                 <el-input placeholder="Please input a name for your model" size="small" v-model="newModelName" />
                 <el-collapse v-model="activeNames" accordion>
                   <el-collapse-item name="1">
@@ -590,8 +599,8 @@
                   </el-collapse-item>
                 </el-collapse>
                 <div class="footer-btn">
-                  <el-button @click="handleStartTrain">Start Train</el-button>
-                  <el-button type="primary" @click="handleNextClick">Next</el-button>
+                  <el-button type="primary" size="small" @click="handleStartTrain" :disabled="isTrainStarted" :loading="isTrainStarted">Start Train</el-button>
+                  <el-button size="small" @click="handleNextClick">Next</el-button>
                 </div>
             </div>
           </el-tab-pane>
@@ -636,8 +645,8 @@
                 </div>
               </div>
               <div class="footer-btn">
-                <el-button size="small" @click="handleStartForcast">Start Forcast</el-button>
-                <el-button type="primary" size="small" @click="handleNextClick">Next</el-button>
+                <el-button type="primary" size="small" @click="handleStartForcast" :disabled="isForcastStarted" :loading="isForcastStarted">Start Forcast</el-button>
+                <el-button size="small" @click="handleNextClick">Next</el-button>
               </div>              
             </div>
           </el-tab-pane>

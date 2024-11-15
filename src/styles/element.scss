@@ -11,6 +11,7 @@ $bg-color-3: rgba(4, 15, 21, 1);
 .el-select-dropdown__item {
     background-color: $bg-color-2;
     color: $lightgray;
+    font-size: 12px;
 }
 .el-select__placeholder {
     color: $lightgray;

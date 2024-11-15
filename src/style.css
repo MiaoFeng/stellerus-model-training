@@ -25,6 +25,9 @@ body,
 .wrap {
   flex-wrap: wrap;
 }
+.mb-8 {
+  margin-bottom: 8px;
+}
 .ft-12 {
   font-size: 12px;
 }
