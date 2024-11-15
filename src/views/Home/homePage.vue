@@ -66,15 +66,22 @@
   }
 
   const activeProjectInfo = ref({});
-  const activeProjectId = ref('');
+  const activeProjectId = ref('HongKong');
   const activeProject = computed(() => {
     return headerStore.activeProject;
   })
   //选择其他project时，获取新project的数据
   watch(activeProject, (newVal) => {
     activeProjectId.value = newVal;
-    const res = get(`/api/project/getProject?id=${newVal}`)
-    activeProjectInfo.value = res;
+    //const res = get(`/api/project/getProject?id=${newVal}`)
+    //activeProjectInfo.value = res;
+    activeProjectInfo.value = {
+        id: "HongKong",
+        name: "HongKong",
+        createdTime: "2024-11-10 10:30:00",
+        updateTime: "2024-11-10 10:30:00",
+        lastExecutedTime: "2024-11-10 10:30:00"
+    }
   })
 
   //获取模型
@@ -256,7 +263,7 @@
       configValue
     }
     console.log(params);
-    const res = await post('http://127.0.0.1:8001/api/trainModel', params);
+    const res = await post('http://127.0.0.1:8001/api/trainModel', {data: params});
     activeNames.value = ['3'];
     console.log(res)
   }
@@ -264,8 +271,8 @@
   //模型精度
   const radarData = ref([]);
   const completeStatus = ref([])
-  const getTrainingStatus = () => {
-    const res = get(`http://127.0.0.1:8001/api/checkTrainStatus?modelId=${model.value}&projectId=${activeProjectId.value}&functionId=${moduleFunc.value}&subModelName=${newModelName.value}`);
+  const getTrainingStatus = async () => {
+    const res = await get(`http://127.0.0.1:8001/api/checkTrainStatus?modelId=${model.value}&projectId=${activeProjectId.value}&functionId=${moduleFunc.value}&subModelName=${newModelName.value}`);
     console.log(res);
     let temp = [];
     res.precision?.forEach(item => {
@@ -284,14 +291,29 @@
 
   const handleStartForcast = async() => {
     const res = await post('http://127.0.0.1:8000/api/runLandslide', {
-        modelId: model.value,
-        projectId: activeProjectId.value,
-        functionId: moduleFunc.value,
-        selectSubModel: newModelName.value,
+        data: {
+          modelId: model.value,
+          projectId: activeProjectId.value,
+          functionId: moduleFunc.value,
+          selectSubModel: newModelName.value,
+        }        
       }
     );
     console.log(res);
     activeNames.value = ['4'];
+    const { result, layerUrl, layerName } = res;
+    const temp = result.map(item => {
+      item.result.name = item.name;
+      return item.result;
+    });
+    colorSampleTableData.value = temp;
+    console.log(layerUrl);
+    const layer = addFilterWmslayer(layerUrl, layerName);
+    const { _rectangle } = layer;
+    viewer.camera.flyTo({
+      destination: Cesium.Rectangle.fromDegrees(_rectangle.west, _rectangle.south, _rectangle.east, _rectangle.north),
+      duration: 3
+    })
   }
 
   //结果
@@ -303,29 +325,36 @@
 
       }
     );
-    const { result, layerUrl } = res;
+    const { result, layerUrl, layerName } = res;
     const temp = result.map(item => {
       item.result.name = item.name;
       return item.result;
     });
     colorSampleTableData.value = temp;
     console.log(layerUrl);
-    addFilterWmslayer(layerUrl, 'result-layer');
+    const layer = addFilterWmslayer(layerUrl, layerName);
+    const { _rectangle } = layer;
+    viewer.camera.flyTo({
+      destination: Cesium.Rectangle.fromDegrees(_rectangle.west, _rectangle.south, _rectangle.east, _rectangle.north),
+      duration: 3
+    })
   }
   //加载结果图层
-  const addFilterWmslayer = (url, layerName) => {
+  const addFilterWmslayer = (url, layers) => {
     var wms = new Cesium.WebMapServiceImageryProvider({
       url: url,
-      layers: layerName,
+      layers: layers,
       parameters: {
         transparent: true, //透明配置
         service: 'WMS',
         format: 'image/png',
-        // srs: 'EPSG:4326',
+        // srs: 'EPSG:32650',
         // CQL_FILTER: filter //过滤条件
-      }
+      },
+      // rectangle: Cesium.Rectangle.fromDegrees(113.79983783365874, 22.119846061573863, 114.51417814759058, 22.570530839616627),
+      // 113.79983783365874%2C22.119846061573863%2C114.51417814759058%2C22.570530839616627
     })
-    let wmsLayer = this.viewer.imageryLayers.addImageryProvider(wms)
+    let wmsLayer = viewer.imageryLayers.addImageryProvider(wms)
     return wmsLayer
   }
 </script>
@@ -342,7 +371,7 @@
             <template #label>
               <div class="custom-tabs-label">
                 <div class="icon"><el-icon><DocumentAdd /></el-icon></div>
-                <div class="label"><span>数据录入</span></div>
+                <div class="label"><span>Data Input</span></div>
               </div>
             </template>
             <div>
@@ -423,12 +452,12 @@
             <template #label>
               <span class="custom-tabs-label">
                 <div class="icon"><el-icon><Tools /></el-icon></div>
-                <div class="label"><span>模型训练</span></div>
+                <div class="label"><span>Training</span></div>
               </span>
             </template>
             <div>
                 <h6>New Model Name</h6>
-                <el-input placeholder="Please input a name for your model" v-model="newModelName" />
+                <el-input placeholder="Please input a name for your model" size="small" v-model="newModelName" />
                 <el-collapse v-model="activeNames" accordion>
                   <el-collapse-item name="1">
                     <template #title>
@@ -488,7 +517,7 @@
                     <template #title>
                       <div class="flex ali-bl just-sb">
                         <h5>Time range of Data</h5>
-                        <div class="description">(用于制作训练样本集和模型训练)</div>
+                        <div class="description">(for model training and training data sets)</div>
                       </div>
                     </template>
                     <el-descriptions
@@ -579,7 +608,7 @@
             <template #label>
               <span class="custom-tabs-label">
                 <div class="icon"><el-icon><TrendCharts /></el-icon></div>
-                <div class="label"><span>模型预测</span></div>
+                <div class="label"><span>Forcast</span></div>
               </span>
             </template>
             <div>
@@ -590,13 +619,26 @@
               </div>
               <div class="gap-4 mb-4 ft-12">
                 <span style="color: lightgray">Create Time: </span>
-                <span>{{activeProjectInfo.createTime}}</span>
+                <span>{{activeProjectInfo.createdTime}}</span>
               </div>
               <div class="flex ali-center gap-4 mb-4">
                 <el-button type="success" size="small" @click="getTrainingStatus">Check</el-button>
                 <span class="ft-12"> - Click to check model building status</span>
               </div>
-              <el-divider />
+            
+              <el-descriptions
+                :column="1"
+                border
+                size="small"
+              >
+              <el-descriptions-item
+                  label="Training Status"
+                  width="120"
+                >
+                  <span :style="{color: completeStatus.status === 'Success' ? '#67c23a' : '#409EFF'}">{{completeStatus.status}}</span>
+                </el-descriptions-item>
+              </el-descriptions>  
+                
               <div>
                 <h5>Training Precision</h5>
                 <div>
@@ -613,7 +655,7 @@
             <template #label>
               <span class="custom-tabs-label">
                 <div class="icon"><el-icon><DataAnalysis /></el-icon></div>
-                <div class="label"><span>计算结果</span></div>
+                <div class="label"><span>Result</span></div>
               </span>
             </template>
             <div>
@@ -624,7 +666,7 @@
               </div>
               <div class="gap-4 mb-4 ft-12">
                 <span style="color: lightgray">Create Time: </span>
-                <span>{{activeProjectInfo.createTime}}</span>
+                <span>{{activeProjectInfo.createdTime}}</span>
               </div>
               <div class="flex ali-center gap-4 mb-4">
                 <el-button type="success" size="small" @click="getResult">Refresh</el-button>

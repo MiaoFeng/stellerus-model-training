@@ -18,7 +18,7 @@
         <el-table-column prop="level" label="Level" width="80">
         <template #default="scope">
             <div :style="{ color: scope.row.color }">
-                {{ scope.row.level }}
+                {{ scope.row.name }}
             </div>
         </template>
         </el-table-column>

@@ -54,6 +54,7 @@ tooltip:{
     right: 16,
   },
   legend: {
+    show: false,
     right: 0,
     bottom: -16,
     itemWidth: 8,
@@ -96,7 +97,7 @@ tooltip:{
 watch(() => props.data, (newVal) => {
     if(chartInstance.value) {
       chartOptions.value.series[0].data = newVal
-      chartInstance.value.setOption(chartOptions)
+      //chartInstance.value.setOption(chartOptions)
       console.log(newVal)
     }
 }, {deep: true})
