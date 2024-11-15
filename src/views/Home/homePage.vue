@@ -776,7 +776,7 @@
       border-radius: 8px;
       padding: 8px 12px;
       margin: 8px 0px;
-      background:rgba(4, 15, 21, 0.4);;
+      background: rgb(240, 247, 250, 0.3);
     }
     .description {
       font-size: 10px;

@@ -29,7 +29,7 @@ const props = defineProps({
     },
     height: {
       type: String,
-      default: '400px'
+      default: '320px'
     },
     unit: {
         type: String,
