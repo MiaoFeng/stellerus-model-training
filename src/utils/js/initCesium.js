@@ -130,8 +130,8 @@ export function initCesium(opts) {
 }
 
 export function accalculatePosition(west, east, south, north) {
-    const lng = (parserFloat(west) + parserFloat(east)) / 2;
-    const lat = (parserFloat(south) + parserFloat(north)) / 2;
+    const lng = (parseFloat(west) + parseFloat(east)) / 2;
+    const lat = (parseFloat(south) + parseFloat(north)) / 2;
     return {
         lng,
         lat
