@@ -661,7 +661,7 @@
               <h5>Project Info</h5>
               <div class="gap-4 mb-4 ft-12">
                 <span style="color: lightgray">Project Name: </span>
-                <span>{{activeProjectInfo.projectName}}</span>
+                <span>{{activeProjectInfo.name}}</span>
               </div>
               <div class="gap-4 mb-4 ft-12">
                 <span style="color: lightgray">Create Time: </span>
@@ -758,9 +758,9 @@
       width: 320px;
     }
     .footer-btn {
-      position: absolute;
+      position: fixed;
       bottom: 0px;
-      width: 100%;
+      width: 367px;
       padding: 0px 16px;
       height: 60px;
       display: flex;

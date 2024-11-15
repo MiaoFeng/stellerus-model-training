@@ -30,7 +30,7 @@
             </div>
         </template>
         </el-table-column>
-        <el-table-column prop="percentage" label="Percentage" width="120">
+        <el-table-column prop="percentage" label="Percentage" width="100">
         <template #default="scope">
             <div :style="{ color: scope.row.color }">
                 {{ scope.row.percentage }}
