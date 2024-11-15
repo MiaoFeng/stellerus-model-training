@@ -138,11 +138,11 @@ export function accalculatePosition(west, east, south, north) {
     }
 }
 
-export function flyTo(viewer, lng, lat, height) {
+export function flyTo(viewer, lng, lat) {
     viewer.camera.flyTo({
-        destination: Cesium.Cartesian3.fromDegrees(lng, lat, height),
+        destination: Cesium.Cartesian3.fromDegrees(lng, lat, 100000),
         orientation: {
-            heading: Cesium.Math.toRadians(180),
+            heading: Cesium.Math.toRadians(0),
             pitch: Cesium.Math.toRadians(-90),
             roll: 0.0
         }
@@ -156,6 +156,6 @@ export function flyToRectangle(viewer, west, south, east, north) {
 
 export function setLayerOpacity(viewer, layer, opacity) {
     if(!viewer || !layer) return;
-    const index = layer.layerIndex;
+    const index = layer._layerIndex;
     viewer.imageryLayers.get(index).alpha = opacity;
 }

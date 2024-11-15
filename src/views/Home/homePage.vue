@@ -307,12 +307,10 @@
       return item.result;
     });
     colorSampleTableData.value = temp;
-    console.log(layerUrl);
-    addFilterWmslayer(layerUrl, layerName);
     const layer = addFilterWmslayer(layerUrl, layerName);
     activeLayer.value = layer;
     const { westBoundLongitude: west, southBoundLatitude: south, eastBoundLongitude: east, northBoundLatitude: north } = layerBbox;
-    flyToRectangle(west, east, south, north);
+    flyToRectangle(viewer, west, east, south, north);
   }
 
   //结果
@@ -330,7 +328,6 @@
       return item.result;
     });
     colorSampleTableData.value = temp;
-    console.log(layerUrl);
     const layer = addFilterWmslayer(layerUrl, layerName);
     const { _rectangle } = layer;
     viewer.camera.flyTo({
