@@ -329,12 +329,11 @@
     });
     colorSampleTableData.value = temp;
     const layer = addFilterWmslayer(layerUrl, layerName);
-    const { _rectangle } = layer;
-    viewer.camera.flyTo({
-      destination: Cesium.Rectangle.fromDegrees(_rectangle.west, _rectangle.south, _rectangle.east, _rectangle.north),
-      duration: 3
-    })
+    activeLayer.value = layer;
+    const { westBoundLongitude: west, southBoundLatitude: south, eastBoundLongitude: east, northBoundLatitude: north } = layerBbox;
+    flyToRectangle(viewer, west, east, south, north);
   }
+  
   //加载结果图层
   const addFilterWmslayer = (url, layers) => {
     var wms = new Cesium.WebMapServiceImageryProvider({

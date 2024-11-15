@@ -138,9 +138,9 @@ export function accalculatePosition(west, east, south, north) {
     }
 }
 
-export function flyTo(viewer, lng, lat) {
+export function flyTo(viewer, lng, lat, height=100000) {
     viewer.camera.flyTo({
-        destination: Cesium.Cartesian3.fromDegrees(lng, lat, 100000),
+        destination: Cesium.Cartesian3.fromDegrees(lng, lat, height),
         orientation: {
             heading: Cesium.Math.toRadians(0),
             pitch: Cesium.Math.toRadians(-90),
