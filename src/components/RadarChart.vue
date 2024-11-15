@@ -98,11 +98,7 @@ tooltip:{
 watch(() => props.data, (newVal) => {
     if(chartInstance.value) {
       chartOptions.value.series[0].data = newVal
-<<<<<<< HEAD
-      //chartInstance.value.setOption(chartOptions)
-=======
       // chartInstance.value.setOption(chartOptions)
->>>>>>> 137e8599da3f535caa4def55ac810129c437afca
       console.log(newVal)
     }
 }, {deep: true})
