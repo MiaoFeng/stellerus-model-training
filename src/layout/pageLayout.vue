@@ -25,8 +25,6 @@ import ContentLayout from './contentLayout.vue';
     height: 100%;
 }
 .common-header {
-    /* background: black; */
-    /* color: #E91E63; */
     padding: 0px;
     background-image: none;
 }
@@ -38,7 +36,7 @@ import ContentLayout from './contentLayout.vue';
     display: block;
     flex: 1;
     flex-basis: auto;
-    overflow: auto;
+    overflow: hidden;
     /* padding: var(--el-main-padding); */
 }
 

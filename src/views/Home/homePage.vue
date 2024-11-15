@@ -2,7 +2,7 @@
   import * as Cesium from 'cesium';
   import { ElTabs, ElTabPane, ElSelect, ElSpace, ElUpload, ElCheckbox, ElCheckboxGroup, ElDivider, ElCollapse, ElCollapseItem, ElDescriptions, ElDescriptionsItem, ElTooltip, ElDatePicker, ElMessage } from 'element-plus';
   import { Tools, TrendCharts, DataAnalysis, DocumentAdd } from '@element-plus/icons-vue'
-  // import { initCesium } from '@/utils/js/initCesium';
+  import { flyToRectangle, setLayerOpacity } from '@/utils/js/initCesium';
   import 'cesium/Build/Cesium/Widgets/widgets.css';
   import { useHeaderStore } from '../../store/headerStore';
   import RadarChart from '@/components/RadarChart.vue';
@@ -73,8 +73,15 @@
   //选择其他project时，获取新project的数据
   watch(activeProject, (newVal) => {
     activeProjectId.value = newVal;
-    const res = get(`/api/project/getProject?id=${newVal}`)
-    activeProjectInfo.value = res;
+    // const res = get(`/api/project/getProject?id=${newVal}`)
+    // activeProjectInfo.value = res;
+    activeProjectInfo.value = {
+        id: "HongKong",
+        name: "HongKong",
+        createdTime: "2024-11-10 10:30:00",
+        updateTime: "2024-11-10 10:30:00",
+        lastExecutedTime: "2024-11-10 10:30:00"
+    };
   })
 
   //获取模型
@@ -264,8 +271,8 @@
   //模型精度
   const radarData = ref([]);
   const completeStatus = ref([])
-  const getTrainingStatus = () => {
-    const res = get(`http://127.0.0.1:8001/api/checkTrainStatus?modelId=${model.value}&projectId=${activeProjectId.value}&functionId=${moduleFunc.value}&subModelName=${newModelName.value}`);
+  const getTrainingStatus = async () => {
+    const res = await get(`http://127.0.0.1:8001/api/checkTrainStatus?modelId=${model.value}&projectId=${activeProjectId.value}&functionId=${moduleFunc.value}&subModelName=${newModelName.value}`);
     console.log(res);
     let temp = [];
     res.precision?.forEach(item => {
@@ -282,6 +289,7 @@
     completeStatus.value = res.completeStatus[0];
   }
 
+  const activeLayer = ref(null);
   const handleStartForcast = async() => {
     const res = await post('http://127.0.0.1:8000/api/runLandslide', {
         modelId: model.value,
@@ -290,8 +298,19 @@
         selectSubModel: newModelName.value,
       }
     );
-    console.log(res);
     activeNames.value = ['4'];
+    const { result, layerUrl, layerName, layerBbox } = res;
+    const temp = result.map(item => {
+      item.result.name = item.name;
+      return item.result;
+    });
+    colorSampleTableData.value = temp;
+    console.log(layerUrl);
+    addFilterWmslayer(layerUrl, layerName);
+    const layer = addFilterWmslayer(layerUrl, layerName);
+    activeLayer.value = layer;
+    const { westBoundLongitude: west, southBoundLatitude: south, eastBoundLongitude: east, northBoundLatitude: north } = layerBbox;
+    flyToRectangle(west, east, south, north);
   }
 
   //结果
@@ -303,14 +322,19 @@
 
       }
     );
-    const { result, layerUrl } = res;
+    const { result, layerUrl, layerName } = res;
     const temp = result.map(item => {
       item.result.name = item.name;
       return item.result;
     });
     colorSampleTableData.value = temp;
     console.log(layerUrl);
-    addFilterWmslayer(layerUrl, 'result-layer');
+    const layer = addFilterWmslayer(layerUrl, layerName);
+    const { _rectangle } = layer;
+    viewer.camera.flyTo({
+      destination: Cesium.Rectangle.fromDegrees(_rectangle.west, _rectangle.south, _rectangle.east, _rectangle.north),
+      duration: 3
+    })
   }
   //加载结果图层
   const addFilterWmslayer = (url, layerName) => {
@@ -325,8 +349,13 @@
         // CQL_FILTER: filter //过滤条件
       }
     })
-    let wmsLayer = this.viewer.imageryLayers.addImageryProvider(wms)
+    let wmsLayer = viewer.imageryLayers.addImageryProvider(wms)
     return wmsLayer
+  }
+
+  //改变图层透明度
+  const changeLayerOpacity = (opacity) => {
+    setLayerOpacity(viewer, activeLayer.value, opacity); //设置图层透明度
   }
 </script>
 
@@ -342,7 +371,7 @@
             <template #label>
               <div class="custom-tabs-label">
                 <div class="icon"><el-icon><DocumentAdd /></el-icon></div>
-                <div class="label"><span>数据录入</span></div>
+                <div class="label"><span>Data Input</span></div>
               </div>
             </template>
             <div>
@@ -423,12 +452,12 @@
             <template #label>
               <span class="custom-tabs-label">
                 <div class="icon"><el-icon><Tools /></el-icon></div>
-                <div class="label"><span>模型训练</span></div>
+                <div class="label"><span>Training</span></div>
               </span>
             </template>
             <div>
                 <h6>New Model Name</h6>
-                <el-input placeholder="Please input a name for your model" v-model="newModelName" />
+                <el-input placeholder="Please input a name for your model" size="small" v-model="newModelName" />
                 <el-collapse v-model="activeNames" accordion>
                   <el-collapse-item name="1">
                     <template #title>
@@ -488,7 +517,7 @@
                     <template #title>
                       <div class="flex ali-bl just-sb">
                         <h5>Time range of Data</h5>
-                        <div class="description">(用于制作训练样本集和模型训练)</div>
+                        <div class="description">(for training sets and model training)</div>
                       </div>
                     </template>
                     <el-descriptions
@@ -501,27 +530,18 @@
                         :key="item.name"
                         :label="item.name"
                       >
-                        <el-tooltip
-                          effect="dark"
-                          placement="top"
-                        >
-                          <template #content>
-                            {{ item.desc }}<br />
-                            Range: {{ item.from }} - {{ item.to }}
-                          </template>
-                          <el-date-picker
-                            v-model="item.value"
-                            type="yearrange"
-                            unlink-panels
-                            size="small"
-                            :disabled-date="disabledDate"
-                            :default-time="[new Date(1985, 1,1, 0,0,0), new Date(2018, 12, 31, 23, 59, 59)]"
-                            range-separator="To"
-                            start-placeholder="Start"
-                            end-placeholder="End"
-                            value-format="YYYY"
-                          />
-                        </el-tooltip>                       
+                        <el-date-picker
+                          v-model="item.value"
+                          type="yearrange"
+                          unlink-panels
+                          size="small"
+                          :disabled-date="disabledDate"
+                          :default-time="[new Date(1985, 1,1, 0,0,0), new Date(2018, 12, 31, 23, 59, 59)]"
+                          range-separator="To"
+                          start-placeholder="Start"
+                          end-placeholder="End"
+                          value-format="YYYY"
+                        />                     
                       </el-descriptions-item>     
                     </el-descriptions>
                   </el-collapse-item>
@@ -579,7 +599,7 @@
             <template #label>
               <span class="custom-tabs-label">
                 <div class="icon"><el-icon><TrendCharts /></el-icon></div>
-                <div class="label"><span>模型预测</span></div>
+                <div class="label"><span>Forcast</span></div>
               </span>
             </template>
             <div>
@@ -590,17 +610,29 @@
               </div>
               <div class="gap-4 mb-4 ft-12">
                 <span style="color: lightgray">Create Time: </span>
-                <span>{{activeProjectInfo.createTime}}</span>
+                <span>{{activeProjectInfo.createdTime}}</span>
               </div>
               <div class="flex ali-center gap-4 mb-4">
                 <el-button type="success" size="small" @click="getTrainingStatus">Check</el-button>
                 <span class="ft-12"> - Click to check model building status</span>
               </div>
-              <el-divider />
+              <!-- <el-divider style="margin-bottom: 8px;"/> -->
+              <el-descriptions
+                :column="1"
+                border
+                size="small"
+              >
+                <el-descriptions-item
+                  label="Training Status"
+                  width="120"
+                >
+                  <span :style="{color: completeStatus.status === 'success' ? '#67c23a' : '#409EFF'}">{{completeStatus.status }}</span>
+                </el-descriptions-item>
+              </el-descriptions>
               <div>
                 <h5>Training Precision</h5>
                 <div>
-                  <RadarChart ref="chart" height="240px" :data="radarData" />
+                  <RadarChart ref="chart" height="240px" width="100%" :data="radarData" />
                 </div>
               </div>
               <div class="footer-btn">
@@ -613,7 +645,7 @@
             <template #label>
               <span class="custom-tabs-label">
                 <div class="icon"><el-icon><DataAnalysis /></el-icon></div>
-                <div class="label"><span>计算结果</span></div>
+                <div class="label"><span>Result</span></div>
               </span>
             </template>
             <div>
@@ -624,7 +656,7 @@
               </div>
               <div class="gap-4 mb-4 ft-12">
                 <span style="color: lightgray">Create Time: </span>
-                <span>{{activeProjectInfo.createTime}}</span>
+                <span>{{activeProjectInfo.createdTime}}</span>
               </div>
               <div class="flex ali-center gap-4 mb-4">
                 <el-button type="success" size="small" @click="getResult">Refresh</el-button>
@@ -635,7 +667,15 @@
               <div class="layer-opacity">
                 <span>Layer opacity:</span>
                 <span>{{ layerOpacity }}</span>
-                <el-slider v-model="layerOpacity" :step="0.1" :min="0" :max="1" size="small" style="width: 50%"/>
+                <el-slider
+                  v-model="layerOpacity"
+                  :step="0.1"
+                  :min="0"
+                  :max="1"
+                  size="small"
+                  style="width: 50%"
+                  @input="(e) => changeLayerOpacity(e)"
+                />
               </div>
               <div class="footer-btn">
                 <el-button type="primary" size="small">Download Result</el-button>
@@ -702,7 +742,7 @@
       transition: left 0.5s;
     }
     .controller-box-show {
-      transition: right 0.5s;
+      transition: left 0.5s;
     }
 
     .default-select {

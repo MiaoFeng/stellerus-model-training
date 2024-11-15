@@ -9,6 +9,7 @@
 </script>
 
 <template>
+    <div>
     <el-table :data="data" style="width: 100%">
         <el-table-column prop="sample" label="Sample" width="60">
             <template #default="scope">
@@ -18,7 +19,7 @@
         <el-table-column prop="level" label="Level" width="80">
         <template #default="scope">
             <div :style="{ color: scope.row.color }">
-                {{ scope.row.level }}
+                {{ scope.row.name }}
             </div>
         </template>
         </el-table-column>
@@ -37,6 +38,7 @@
         </template>
         </el-table-column>
     </el-table>
+    </div>
 </template>
 
 <style lang="scss" scoped>

@@ -12,7 +12,15 @@ const headerStore = useHeaderStore();
 
 //获取项目列表
 const getProjects = async () => {
-    const res = await get('https://virtserver.swaggerhub.com/MIAOFENG/project/1.0.0/getList');
+    const res1 = await get('https://virtserver.swaggerhub.com/MIAOFENG/project/1.0.0/getList');
+    console.log(res1);
+    const res = [{
+        id: "HongKong",
+        name: "HongKong",
+        createdTime: "2024-11-10 10:30:00",
+        updateTime: "2024-11-10 10:30:00",
+        lastExecutedTime: "2024-11-10 10:30:00"
+    }];
     return res;
 }
 
@@ -40,7 +48,7 @@ onMounted(async() => {
     const res = await getProjects();
     projectOptions.value = res;
     activeProject.value = res[0].id;
-    headerStore.setProject(res[0].id);
+    headerStore.setActiveProject(res[0].id);
 })
 
 const handleSelect = (key, keyPath) => {
@@ -68,6 +76,7 @@ const rules = reactive({
 </script>
 
 <template>
+    <div>
     <el-menu
         :default-active="activeIndex"
         class="el-menu-demo"
@@ -136,6 +145,7 @@ const rules = reactive({
             </template>
         </el-dialog>
     </el-menu>
+    </div>
 </template>
 
 <style lang="scss" scoped>
