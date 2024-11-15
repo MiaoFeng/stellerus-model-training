@@ -322,7 +322,7 @@
 
       }
     );
-    const { result, layerUrl, layerName } = res;
+    const { result, layerUrl, layerName, layerBbox } = res;
     const temp = result.map(item => {
       item.result.name = item.name;
       return item.result;
