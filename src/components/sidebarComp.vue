@@ -27,7 +27,6 @@
 .sideBar {
   width: 368px;
   height: 100%;
-//   background-color: rgba(7, 20, 35, 0.7);
   position: absolute;
   top: 0px;
   left: 0px;
@@ -47,8 +46,11 @@
   justify-content: center;
   align-items: center;
 }
+.controller-box-show {
+  transition: left 0.5s;
+}
 .controller-box-hide {
   right: -368px !important;
-  transition: right 0.5s;
+  transition: left 0.5s;
 }
 </style>

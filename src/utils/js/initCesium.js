@@ -128,3 +128,34 @@ export function initCesium(opts) {
 
     return viewer;
 }
+
+export function accalculatePosition(west, east, south, north) {
+    const lng = (parserFloat(west) + parserFloat(east)) / 2;
+    const lat = (parserFloat(south) + parserFloat(north)) / 2;
+    return {
+        lng,
+        lat
+    }
+}
+
+export function flyTo(viewer, lng, lat, height) {
+    viewer.camera.flyTo({
+        destination: Cesium.Cartesian3.fromDegrees(lng, lat, height),
+        orientation: {
+            heading: Cesium.Math.toRadians(180),
+            pitch: Cesium.Math.toRadians(-90),
+            roll: 0.0
+        }
+    });
+}
+
+export function flyToRectangle(viewer, west, south, east, north) {
+    const { lng, lat } = accalculatePosition(west, south, east, north);
+    flyTo(viewer, lng, lat);
+}
+
+export function setLayerOpacity(viewer, layer, opacity) {
+    if(!viewer || !layer) return;
+    const index = layer.layerIndex;
+    viewer.imageryLayers.get(index).alpha = opacity;
+}

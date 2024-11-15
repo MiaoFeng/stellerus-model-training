@@ -49,20 +49,21 @@ tooltip:{
     show: true
   },
   grid: {
-    top: 100,
+    top: 10,
     left: 40,
     right: 16,
+    bottom: 20
   },
   legend: {
     show: false,
-    right: 0,
-    bottom: -16,
+    top: 0,
     itemWidth: 8,
     itemHeight: 8,
     textStyle: {
       color: '#fff',
       fontSize: 12,
-    }    
+    },
+    data: ['Train', 'Validation', 'Test' ]    
   },
   radar: {
     indicator: [
@@ -97,7 +98,11 @@ tooltip:{
 watch(() => props.data, (newVal) => {
     if(chartInstance.value) {
       chartOptions.value.series[0].data = newVal
+<<<<<<< HEAD
       //chartInstance.value.setOption(chartOptions)
+=======
+      // chartInstance.value.setOption(chartOptions)
+>>>>>>> 137e8599da3f535caa4def55ac810129c437afca
       console.log(newVal)
     }
 }, {deep: true})

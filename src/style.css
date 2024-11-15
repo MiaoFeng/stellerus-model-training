@@ -10,6 +10,9 @@ body,
     box-sizing: border-box;
 }
 
+.flex {
+  display: flex;
+}
 .ali-center {
   align-items: center;
 }

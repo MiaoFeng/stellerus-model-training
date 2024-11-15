@@ -9,6 +9,7 @@
 </script>
 
 <template>
+    <div>
     <el-table :data="data" style="width: 100%">
         <el-table-column prop="sample" label="Sample" width="60">
             <template #default="scope">
@@ -37,6 +38,7 @@
         </template>
         </el-table-column>
     </el-table>
+    </div>
 </template>
 
 <style lang="scss" scoped>
