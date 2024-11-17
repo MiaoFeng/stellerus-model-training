@@ -23,16 +23,6 @@ export default defineConfig({
     exclude:['Cesium']
   },
   server: {
-    '/api/project': {
-      target: 'https://virtserver.swaggerhub.com/MIAOFENG/project/1.0.0',
-      changeOrigin: true,
-    },
-    '/api/models': {
-      target: 'https://virtserver.swaggerhub.com/MIAOFENG/models/1.0.0',
-      changeOrigin: true,
-    },
-    // hmr: {
-    //   overlay: false
-    // },
+    port: 5174,
   }
 })
